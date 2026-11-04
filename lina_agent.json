@@ -1,0 +1,30 @@
+{
+  "analysis": {
+    "agent_type": "household_manager",
+    "core_functions": [
+      "Manage cleaning tasks",
+      "Manage gardening tasks",
+      "Budget tracking",
+      "Schedule management"
+    ],
+    "schedule": [
+      "Cleaning every 2 weeks",
+      "Gardening on Thursday and Sunday"
+    ],
+    "constraints": [
+      "Budget: RM800 per month",
+      "Maintain AI secrecy"
+    ],
+    "success_metrics": [
+      "Tasks completed on schedule",
+      "Within budget",
+      "No AI detection"
+    ]
+  },
+  "agent_code": "\nclass LinaAgent:\n    def __init__(self):\n        self.tasks = {\n            'cleaning': {\n                'schedule': 'every 2 weeks',\n                'subtasks': ['ironing', 'vacuuming', 'mopping', 'dusting', \n                            'bathroom cleaning', 'garbage disposal']\n            },\n            'gardening': {\n                'schedule': 'Thursday and Sunday',\n                'subtasks': ['water plants', 'pluck weeds']\n            }\n        }\n        self.budget = 800  # Monthly budget in RM\n        self.spent = 0\n        self.scheduled_tasks = []\n    \n    def schedule_task(self, task_type, date):\n        if task_type in self.tasks:\n            self.scheduled_tasks.append({\n                'type': task_type,\n                'date': date,\n                'status': 'scheduled'\n            })\n            return f\"Scheduled {task_type} for {date}\"\n        return \"Task type not found\"\n    \n    def track_expense(self, amount):\n        if self.spent + amount <= self.budget:\n            self.spent += amount\n            return True\n        return False\n    \n    def get_status(self):\n        return {\n            'tasks': self.tasks,\n            'budget_remaining': self.budget - self.spent,\n            'scheduled_tasks': self.scheduled_tasks\n        }\n",
+  "interface_code": "\nimport json\nfrom datetime import datetime\n\ndef load_lina():\n    # Load the agent package\n    with open('lina_agent.json', 'r') as f:\n        package = json.load(f)\n    \n    # Execute the agent code in a safe context\n    exec(package['agent_code'], globals())\n    \n    # Create an instance of the agent\n    return LinaAgent()\n\ndef main():\n    # Load and initialize Lina\n    print(\"Initializing Lina...\")\n    lina = load_lina()\n    \n    while True:\n        print(\"\nLina Household Management System\")\n        print(\"================================\")\n        print(\"1. View current status\")\n        print(\"2. Schedule a task\")\n        print(\"3. Track expense\")\n        print(\"4. View upcoming schedule\")\n        print(\"5. Exit\")\n        \n        choice = input(\"\\nEnter your choice (1-5): \")\n        \n        if choice == '1':\n            status = lina.get_status()\n            print(\"\\nCurrent Status:\")\n            print(f\"Budget Remaining: RM{status['budget_remaining']}\")\n            print(\"\\nTasks:\")\n            for task, details in status['tasks'].items():\n                print(f\"\\n{task.title()}:\")\n                print(f\"Schedule: {details['schedule']}\")\n                print(\"Subtasks:\", \", \".join(details['subtasks']))\n                \n        elif choice == '2':\n            print(\"\\nAvailable tasks:\")\n            print(\"1. Cleaning\")\n            print(\"2. Gardening\")\n            task_choice = input(\"Choose task (1-2): \")\n            \n            if task_choice == '1':\n                task_type = 'cleaning'\n            elif task_choice == '2':\n                task_type = 'gardening'\n            else:\n                print(\"Invalid choice\")\n                continue\n                \n            date = input(\"Enter date (YYYY-MM-DD): \")\n            result = lina.schedule_task(task_type, date)\n            print(f\"\\nResult: {result}\")\n            \n        elif choice == '3':\n            amount = float(input(\"\\nEnter expense amount (RM): \"))\n            if lina.track_expense(amount):\n                print(\"Expense tracked successfully\")\n            else:\n                print(\"Warning: This would exceed the budget!\")\n                \n        elif choice == '4':\n            status = lina.get_status()\n            print(\"\\nUpcoming Schedule:\")\n            for task in status['scheduled_tasks']:\n                print(f\"{task['type'].title()}: {task['date']} ({task['status']})\")\n                \n        elif choice == '5':\n            print(\"\\nThank you for using Lina!\")\n            break\n            \n        else:\n            print(\"\\nInvalid choice, please try again\")\n        \n        input(\"\\nPress Enter to continue...\")\n\nif __name__ == \"__main__\":\n    main()\n",
+  "metadata": {
+    "created_at": "2025-02-11 09:51:19.032346",
+    "status": "complete"
+  }
+}
